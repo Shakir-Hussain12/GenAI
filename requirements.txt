@@ -1,0 +1,24 @@
+openai
+python-dotenv
+
+
+
+# langhcain
+langchain
+langchain-core
+langchain-community
+
+
+# langchain integeration
+langchain-openai
+langchain[google-genai]
+# langchain[huggingface]
+langchain-groq
+
+
+# UI
+# streamlit
+
+
+# pdf loader
+# PyPDF2
