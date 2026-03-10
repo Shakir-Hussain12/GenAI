@@ -1,8 +1,7 @@
 openai
 python-dotenv
 
-
-
+ 
 # langhcain
 langchain
 langchain-core
@@ -10,15 +9,15 @@ langchain-community
 
 
 # langchain integeration
-langchain-openai
-langchain[google-genai]
-# langchain[huggingface]
 langchain-groq
-
-
+# langchain-openai
+# langchain[google-genai]
+# langchain[huggingface]
+ 
+ 
 # UI
-# streamlit
+streamlit
 
 
 # pdf loader
-# PyPDF2
+PyPDF2
