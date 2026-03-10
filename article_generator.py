@@ -3,8 +3,8 @@
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser 
 from langchain_groq import ChatGroq
-import streamlit as st
 from dotenv import load_dotenv
+import streamlit as st
 
 load_dotenv()
 parser = StrOutputParser()
@@ -21,8 +21,8 @@ prompt = ChatPromptTemplate.from_messages([
 tone_selection = ["Formal", "Concise", "Strategic"]
 
 st.header("Executive Strategic Article Generator")
-user_query = st.text_input("Please enter the topic for the article...", key="user_query")
-tone = st.pills("Please select tone for the article",tone_selection, default="Formal")
+user_query = st.text_input("Please enter the topic for the article...")
+tone = st.pills("Please select tone for the article", tone_selection, default="Formal")
 
 if st.button("Generate Article"):
     if user_query:
