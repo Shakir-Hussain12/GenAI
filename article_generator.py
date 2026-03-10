@@ -1,16 +1,13 @@
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder 
+# I did this assignment late, so I included some of the latest topics discussed in class.
+
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser 
 from langchain_groq import ChatGroq
 import streamlit as st
 from dotenv import load_dotenv
 
 load_dotenv()
-
-tone_selection = ["Formal", "Concise", "Strategic"]
-
-
-st.header("Executive Strategic Article Generator")
-user_query = st.text_input("Please enter the topic for the article. To stop, simply leave the input empty and press Enter.")
-tone = st.selectbox("Please select a tone for the article: ", tone_selection)
+parser = StrOutputParser()
 
 llm = ChatGroq(
     model="llama-3.1-8b-instant"
@@ -21,8 +18,25 @@ prompt = ChatPromptTemplate.from_messages([
     ("human", "Write a complete, professional article about: {article_topic}")
 ])
 
+tone_selection = ["Formal", "Concise", "Strategic"]
+
+st.header("Executive Strategic Article Generator")
+user_query = st.text_input("Please enter the topic for the article...", key="user_query")
+tone = st.pills("Please select tone for the article",tone_selection, default="Formal")
+
 if st.button("Generate Article"):
     if user_query:
-        st.write("Generating article...")
+        with st.spinner("Generating article..."):    
+            chain = prompt | llm | parser
+            article = chain.invoke({
+                "selected_tone": tone,
+                "article_topic": user_query
+            })
+
+            st.subheader("Generated Article:")
+            st.markdown(article)
+
+            if st.button("Generate Another Article"):
+                st.rerun()
     else:
-        st.write("Generation stopped, exiting...")
+        st.warning("Please enter a topic to generate the article.")
