@@ -1,5 +1,5 @@
 from langchain_core.prompts import PromptTemplate
-from langchain_core.runnables import RunnableParallel  
+from langchain_core.runnables import RunnablePassthrough  
 from langchain_groq import ChatGroq
 from pydantic import BaseModel, Field
 from dotenv import load_dotenv
@@ -18,12 +18,6 @@ prompt = PromptTemplate.from_template(
             """ 
         )
 
- 
-summary_prompt = PromptTemplate.from_template(
-    """
-        Create a comprehensive summary of the provided document containing drug information: {drug_info}
-    """
-)
 
 class DrugReport(BaseModel):
     drug_name: str = Field(..., description="Name of the drug") 
@@ -34,28 +28,30 @@ class DrugReport(BaseModel):
     contraindications: str = Field(..., description="Contraindications for use")
     summary: str = Field(..., description="A comprehensive summary of the drug information")
 
+
 def extract_text_from_pdf(file):
     pdf_reader = PyPDF2.PdfReader(file)
     text_content = ""
     text_content += "\n".join(page.extract_text() for page in pdf_reader.pages) 
     return text_content    
-      
+
+
 st.title("Drug Analyzer")
 uploaded_file = st.file_uploader("Upload a drug information file", type=["pdf"])
 
 if st.button("Analyze"):
     if uploaded_file is not None:
-        drug_info_text = extract_text_from_pdf(uploaded_file) 
-        structured_llm = llm.with_structured_output(DrugReport)
+        drug_info_text = extract_text_from_pdf(uploaded_file)
 
-        # using chains to make sure input is sterilized properly
-        structured_chain = prompt | structured_llm
-        # additional chain to generate summary of the given document
-        summary_chain = summary_prompt | llm
-        chain = RunnableParallel({
-            "drug_report": structured_chain,
-            "summary": summary_chain
-        })    
+        # enforcing desired schema to the output 
+        structured_llm = llm.with_structured_output(DrugReport)
+ 
+        # using multiple chains to handle both structured extraction of drug information and a general summary of the document. 
+        chain = RunnablePassthrough() | {
+            "drug_report": prompt | structured_llm,
+            "summary": (lambda x: f"Create a comprehensive summary of: {x['drug_info']}") | llm
+        }
+        
         with st.spinner("Analyzing drug information..."): 
             try:
                 response = chain.invoke({"drug_info": drug_info_text}) 
