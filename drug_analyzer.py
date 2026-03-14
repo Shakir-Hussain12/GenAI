@@ -3,6 +3,7 @@ from langchain_groq import ChatGroq
 from pydantic import BaseModel, Field
 from dotenv import load_dotenv
 import streamlit as st
+import PyPDF2
 
 load_dotenv() 
 llm = ChatGroq(
@@ -31,12 +32,20 @@ class DrugReport(BaseModel):
     side_effects: str = Field(..., description="Possible side effects"),
     contraindications: str = Field(..., description="Contraindications for use"),
 
+def extract_text_from_pdf(file):
+    pdf_reader = PyPDF2.PdfReader(file)
+    text_content = ""
+    text_content += "\n".join(page.extract_text() for page in pdf_reader.pages) 
+    return text_content    
+      
 st.title("Drug Analyzer")
-uploaded_file = st.file_uploader("Upload a drug information file", type=["txt", "pdf", "docx"])
+uploaded_file = st.file_uploader("Upload a drug information file", type=["pdf"])
 
 if st.button("Analyze"):
     if uploaded_file is not None:
+        drug_info_text = extract_text_from_pdf(uploaded_file) 
+        structured_llm = llm.with_structured_output(DrugReport)
         with st.spinner("Analyzing drug information..."):
-            st.write("Analyzing the uploaded drug information...")
+            response = structured_llm.invoke(input={"drug_info": drug_info_text}) 
     else:
         st.warning("Please upload a drug information file to analyze.")
