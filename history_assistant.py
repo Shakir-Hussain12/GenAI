@@ -44,6 +44,14 @@ question = st.text_input("Ask a history question: ")
 
 if st.button("Search for the answer"):
     if question:
-        pass
+        def streaming_response():
+            for token in rag_chain.stream(question):
+                yield token
+
+        try:
+            st.subheader(f"Information retrieved for: '{question}'")
+            st.write_stream(streaming_response())
+        except Exception as e:
+            st.error(f"An error occurred: {e}")
     else:
         st.warning("Please enter a question.")
