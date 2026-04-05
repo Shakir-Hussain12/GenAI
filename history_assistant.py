@@ -86,8 +86,6 @@ if st.button("Search for the answer"):
             for discussion in st.session_state.previous_discussions:
                 st.write(discussion)
 
-        print(f"Current number of discussions: {len(st.session_state.previous_discussions)}")
-        
         
         # summarizing the history of discussions to maintain a concise context for the LLM
         summary_chain = (   

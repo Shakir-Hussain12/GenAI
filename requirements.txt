@@ -9,10 +9,10 @@ langchain-community
 
 
 # langchain integeration
-langchain-groq
-# langchain-openai
 # langchain[google-genai]
-# langchain[huggingface]
+# langchain-openai
+langchain-groq
+langchain[huggingface]
  
  
 # UI
@@ -22,3 +22,6 @@ streamlit
 # pdf loader
 PyPDF2
 wikipedia
+
+#transformers
+sentence-transformers
